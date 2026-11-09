@@ -1,0 +1,25 @@
+[Unit]
+Description=MariaDB database server (Red Hat Hardened Image)
+Requires=lamp-secrets.service
+After=lamp-secrets.service
+Before=php-fpm.service
+
+[Container]
+Image=registry.access.redhat.com/hi/mariadb:latest
+ContainerName=mariadb
+Network=lamp.network
+PublishPort=3306:3306
+Secret=mariadb_root_password,type=env,target=MARIADB_ROOT_PASSWORD
+Secret=mariadb_app_password,type=env,target=MARIADB_PASSWORD
+Environment=MARIADB_USER=appuser
+Environment=MARIADB_DATABASE=hellodb
+Volume=mariadb-data.volume:/var/lib/mysql:Z
+
+# Enable independent updates without a full OS reboot
+AutoUpdate=registry
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

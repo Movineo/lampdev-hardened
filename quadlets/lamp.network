@@ -1,0 +1,2 @@
+[Network]
+# No extra config needed; this creates a basic bridge for our stack.

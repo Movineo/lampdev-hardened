@@ -1,0 +1,24 @@
+[Unit]
+Description=PHP-FPM application server (Red Hat Hardened Image)
+Requires=mariadb.service lamp-secrets.service
+After=mariadb.service lamp-secrets.service
+Before=httpd.service
+
+[Container]
+Image=registry.access.redhat.com/hi/php:latest-fpm
+ContainerName=php-fpm
+Network=lamp.network
+Environment=DB_HOST=mariadb
+Environment=DB_USER=appuser
+Secret=mariadb_app_password,type=env,target=DB_PASS
+Environment=DB_NAME=hellodb
+Volume=/srv/www:/var/www/html:z
+
+# Enable independent updates without a full OS reboot
+AutoUpdate=registry
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target

@@ -1,0 +1,56 @@
+cat >> .gitignore <<'EOF'
+
+# Secrets and credentials
+.env
+.env.*
+*.secret
+lamp-secrets-generated.txt
+config.toml
+user-data
+
+# VM images and generated artifacts
+output/
+*.qcow2
+*.raw
+*.iso
+
+# Temporary files
+*.log
+*.tmp
+EOF
+
+# Secrets and credentials
+.env
+.env.*
+*.secret
+lamp-secrets-generated.txt
+config.toml
+user-data
+
+# VM images and generated artifacts
+output/
+*.qcow2
+*.raw
+*.iso
+
+# Temporary files
+*.log
+*.tmp
+
+# Secrets and credentials
+.env
+.env.*
+*.secret
+lamp-secrets-generated.txt
+config.toml
+user-data
+
+# VM images and generated artifacts
+output/
+*.qcow2
+*.raw
+*.iso
+
+# Temporary files
+*.log
+*.tmp

@@ -1,0 +1,45 @@
+FROM registry.redhat.io/rhel10/rhel-bootc:latest
+
+# Register temporarily, install firewalld, and clean subscription data
+RUN set -eux; \
+    cleanup() { \
+        subscription-manager unregister || true; \
+        subscription-manager clean || true; \
+    }; \
+    trap cleanup EXIT; \
+    subscription-manager register \
+        --activationkey=lampdev-build \
+        --org=17839546; \
+    dnf -y install firewalld; \
+    dnf clean all; \
+    rm -rf /var/cache/dnf
+
+# Copy PHP application
+COPY app/ /srv/www/
+
+# Copy Apache PHP-FPM configuration
+COPY httpd/proxy-php.conf /etc/httpd/conf.d/proxy-php.conf
+
+# Copy Quadlet definitions
+COPY quadlets/lamp.network /usr/share/containers/systemd/lamp.network
+COPY quadlets/mariadb-data.volume /usr/share/containers/systemd/mariadb-data.volume
+COPY quadlets/mariadb.container /usr/share/containers/systemd/mariadb.container
+COPY quadlets/php-fpm.container /usr/share/containers/systemd/php-fpm.container
+COPY quadlets/httpd.container /usr/share/containers/systemd/httpd.container
+
+# Copy secret provisioning script
+COPY setup-secrets.sh /usr/local/bin/setup-secrets.sh
+RUN chmod 755 /usr/local/bin/setup-secrets.sh
+
+# Install secret provisioning service
+COPY systemd/lamp-secrets.service /usr/lib/systemd/system/lamp-secrets.service
+RUN systemctl enable lamp-secrets.service
+
+# Configure firewall
+RUN firewall-offline-cmd --add-port=8080/tcp && \
+    systemctl enable firewalld.service
+
+# Configure weekly Podman automatic updates
+COPY systemd/podman-auto-update.timer.d/override.conf /etc/systemd/system/podman-auto-update.timer.d/override.conf
+
+RUN systemctl enable podman-auto-update.timer

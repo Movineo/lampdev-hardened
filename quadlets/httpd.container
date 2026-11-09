@@ -1,0 +1,21 @@
+[Unit]
+Description=Apache httpd reverse proxy (Red Hat Hardened Image)
+Requires=php-fpm.service
+After=php-fpm.service
+
+[Container]
+Image=registry.access.redhat.com/hi/httpd:latest
+ContainerName=httpd
+Network=lamp.network
+PublishPort=8080:8080
+Volume=/srv/www:/var/www/html:z,ro
+Volume=/etc/httpd/conf.d/proxy-php.conf:/etc/httpd/conf.d/proxy-php.conf:Z,ro
+
+# Enable independent updates without a full OS reboot
+AutoUpdate=registry
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=multi-user.target default.target
